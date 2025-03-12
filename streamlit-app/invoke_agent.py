@@ -11,7 +11,11 @@ from botocore.awsrequest import AWSRequest
 from botocore.credentials import Credentials
 from requests import request
 
-ssm = boto3.client('ssm')
+# ---------------------------------------------------------------------
+# REGION CONFIGURATION:
+# ---------------------------------------------------------------------
+theRegion = "us-east-1"
+ssm = boto3.client('ssm', region_name = theRegion)
 
 # ---------------------------------------------------------------------
 # Replace with your actual Agent ID and Alias ID below:
@@ -24,11 +28,6 @@ agentAliasId = "0XNX7B0H4I" #INPUT YOUR ALIAS ID HERE.
 #agentId = ssm.get_parameter(Name='/agent-id', WithDecryption=True)['Parameter']['Value'] #valid if CFN infrastructure templates were ran
 #agentAliasId = ssm.get_parameter(Name='/alias-id', WithDecryption=True)['Parameter']['Value'] #valid if CFN infrastructure templates were ran
 
-
-# ---------------------------------------------------------------------
-# REGION CONFIGURATION:
-# ---------------------------------------------------------------------
-theRegion = "us-east-1"
 os.environ["AWS_REGION"] = theRegion
 
 # ---------------------------------------------------------------------
