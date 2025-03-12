@@ -17,8 +17,8 @@ ssm = boto3.client('ssm')
 # Replace with your actual Agent ID and Alias ID below:
 # ---------------------------------------------------------------------
 
-agentId = "<YOUR AGENT ID>" #INPUT YOUR AGENT ID HERE.
-agentAliasId = "<YOUR ALIAS ID>" #INPUT YOUR ALIAS ID HERE.
+agentId = "discovery-agent" #INPUT YOUR AGENT ID HERE.
+agentAliasId = "0XNX7B0H4I" #INPUT YOUR ALIAS ID HERE.
 
 # Fetch parameters
 #agentId = ssm.get_parameter(Name='/agent-id', WithDecryption=True)['Parameter']['Value'] #valid if CFN infrastructure templates were ran
