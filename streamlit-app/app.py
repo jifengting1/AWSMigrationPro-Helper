@@ -103,13 +103,13 @@ if submit_button and prompt:
 
     # Use trace_data and formatted_response as needed
     # st.sidebar.text_area("", value=all_data, height=300)
-    st.session_state['history'].append({"question": prompt, "answer": the_response})
+    st.session_state['history'].append({"question": prompt, "answer": the_response,"agent": selected_agent})
     # st.session_state['trace_data'] = the_response
     st.session_state['prompt'] = "" # clear out input box
   
 
 if end_session_button:
-    st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
+    st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!", "agent": selected_agent})
     event = {
         "sessionId": "MYSESSION",
         "question": "placeholder to end session",
@@ -126,7 +126,7 @@ displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 # Create a scrollable text area with the entire chat history
 full_history_text = "<br><br>".join(
     [
-        f"<b>You:</b> {chat['question']}<br><b>{selected_agent}:</b> {chat['answer']}"
+        f"<b>You:</b> {chat['question']}<br><b>{chat['agent']}:</b> {chat['answer']}"
         for chat in st.session_state['history']
     ]
 )
