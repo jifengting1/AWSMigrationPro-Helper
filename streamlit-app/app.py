@@ -39,14 +39,14 @@ selected_agent = st.sidebar.selectbox("Select Tool", agentList)
 
 # Your agent and alias IDs from the Bedrock console
 if selected_agent=='Discovery Agent':
-    agent_id = "OMEPOPUX72"
-    agent_alias_id = "0XNX7B0H4I"
+    agent_id = os.getenv("DISCOVERY_AGENT_ID", "default-discovery-id")
+    agent_alias_id = os.getenv("DISCOVERY_AGENT_ALIAS_ID", "default-discovery-alias-id")
 if selected_agent=='Analysis Agent':
-    agent_id = "PUY8SXIC0X"
-    agent_alias_id = "JW2V480V0Y"
+    agent_id = os.getenv("ANALYSIS_AGENT_ID", "default-analysis-id")
+    agent_alias_id = os.getenv("ANALYSIS_AGENT_ALIAS_ID", "default-analysis-alias-id")
 if selected_agent == "Recommendation Agent":
-    agent_id = "XXXXXXXXXX"
-    agent_alias_id = "XXXXXXXXXX"
+    agent_id = os.getenv("RECOMMENDATION_AGENT_ID", "default-recommendation-id")
+    agent_alias_id = os.getenv("RECOMMENDATION_AGENT_ALIAS_ID", "default-recommendation-alias-id")
 
 # Text input box
 st.write(selected_agent)
