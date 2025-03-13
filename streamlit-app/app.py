@@ -94,8 +94,13 @@ if end_session_button:
     agenthelper.lambda_handler(event, None)
     st.session_state['history'].clear()
 
+MAX_HISTORY_WINDOW = 6
+
 # Display conversation history
 st.write("## Conversation History")
+
+# Display recent messages in a structured layout
+displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 
 # Load images outside the loop to optimize performance
 human_image_path = os.path.expanduser('~/app/streamlit-app/human_face.png')
@@ -105,7 +110,8 @@ robot_image = Image.open(robot_image_path)
 circular_human_image = crop_to_circle(human_image)
 circular_robot_image = crop_to_circle(robot_image)
 
-for index, chat in enumerate(reversed(st.session_state['history'])):
+# for index, chat in enumerate(reversed(st.session_state['history'])):
+for index, chat in enumerate(displayed_history):
     # Creating columns for Question
     col1_q, col2_q = st.columns([2, 10])
     with col1_q:
@@ -128,3 +134,10 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         with col2_a:
             # Generate a unique key for each answer text area
             st.text_area("Answer:", value=chat["answer"], height=100, key=f"answer_{index}")
+
+# Create a scrollable text area with the entire chat history
+full_history_text = "\n\n".join(
+    [f"Q: {chat['question']}\nA: {chat['answer']}" for chat in st.session_state['history']]
+)
+
+st.text_area("Full Conversation History", value=full_history_text, height=400, disabled=True)
