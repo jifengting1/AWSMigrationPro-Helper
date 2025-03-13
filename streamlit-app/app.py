@@ -3,6 +3,7 @@ import streamlit as st
 import json
 import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
+import os
 
 # Streamlit page configuration
 st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
@@ -97,8 +98,10 @@ if end_session_button:
 st.write("## Conversation History")
 
 # Load images outside the loop to optimize performance
-human_image = Image.open('~/app/streamlit-app/human_face.png')
-robot_image = Image.open('~/app/streamlit-app/robot_face.jpg')
+human_image_path = os.path.expanduser('~/app/streamlit-app/human_face.png')
+robot_image_path = os.path.expanduser('~/app/streamlit-app/robot_face.jpg')
+human_image = Image.open(human_image_path)
+robot_image = Image.open(robot_image_path)
 circular_human_image = crop_to_circle(human_image)
 circular_robot_image = crop_to_circle(robot_image)
 
