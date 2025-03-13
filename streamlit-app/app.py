@@ -95,16 +95,16 @@ if submit_button and prompt:
     
     try:
         # Extract the response and trace data
-        all_data = format_response(response_data['response']) # raw tracing data for debugging purpose, not showing in the current version
-        the_response = response_data['trace_data'] # the actural agent response
+        # all_data = format_response(response_data['trace_data']) # raw tracing data for debugging purpose, not showing in the current version
+        the_response = response_data['response'] # the actural agent response
     except:
-        all_data = "..." 
+        # all_data = "..." 
         the_response = "Apologies, but an error occurred. Please rerun the application" 
 
     # Use trace_data and formatted_response as needed
-    st.sidebar.text_area("", value=all_data, height=300)
-    st.session_state['history'].append({"question": prompt, "answer": the_response})
-    st.session_state['trace_data'] = the_response
+    # st.sidebar.text_area("", value=all_data, height=300)
+    st.session_state['history'].append({"You": prompt, selected_agent: the_response})
+    # st.session_state['trace_data'] = the_response
     st.session_state['prompt'] = "" # clear out input box
   
 
