@@ -102,42 +102,9 @@ st.write("## Conversation History")
 # Display recent messages in a structured layout
 displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 
-# Load images outside the loop to optimize performance
-human_image_path = os.path.expanduser('~/app/streamlit-app/human_face.png')
-robot_image_path = os.path.expanduser('~/app/streamlit-app/robot_face.jpg')
-human_image = Image.open(human_image_path)
-robot_image = Image.open(robot_image_path)
-circular_human_image = crop_to_circle(human_image)
-circular_robot_image = crop_to_circle(robot_image)
-
-# for index, chat in enumerate(reversed(st.session_state['history'])):
-for index, chat in enumerate(displayed_history):
-    # Creating columns for Question
-    col1_q, col2_q = st.columns([2, 10])
-    with col1_q:
-        st.image(circular_human_image, width=125)
-    with col2_q:
-        # Generate a unique key for each question text area
-        st.text_area("Question:", value=chat["question"], height=68, key=f"question_{index}", disabled=True)
-
-    # Creating columns for Answer
-    col1_a, col2_a = st.columns([2, 10])
-    if isinstance(chat["answer"], pd.DataFrame):
-        with col1_a:
-            st.image(circular_robot_image, width=100)
-        with col2_a:
-            # Generate a unique key for each answer dataframe
-            st.dataframe(chat["answer"], key=f"answer_df_{index}")
-    else:
-        with col1_a:
-            st.image(circular_robot_image, width=150)
-        with col2_a:
-            # Generate a unique key for each answer text area
-            st.text_area("Answer:", value=chat["answer"], height=100, key=f"answer_{index}")
-
 # Create a scrollable text area with the entire chat history
 full_history_text = "\n\n".join(
-    [f"Q: {chat['question']}\nA: {chat['answer']}" for chat in st.session_state['history']]
+    [f"**Question:** {chat['question']}\n**Answer**: {chat['answer']}" for chat in st.session_state['history']]
 )
 
-st.text_area("Full Conversation History", value=full_history_text, height=400, disabled=True)
+st.text_area("Conversation History wiht Discovery Agent", value=full_history_text, height=400, disabled=True)
