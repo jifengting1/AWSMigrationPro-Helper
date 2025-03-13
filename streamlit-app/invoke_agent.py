@@ -21,7 +21,7 @@ ssm = boto3.client('ssm', region_name = theRegion)
 # Replace with your actual Agent ID and Alias ID below:
 # ---------------------------------------------------------------------
 
-agentId = "discovery-agent" #INPUT YOUR AGENT ID HERE.
+agentId = "OMEPOPUX72" #INPUT YOUR AGENT ID HERE.
 agentAliasId = "0XNX7B0H4I" #INPUT YOUR ALIAS ID HERE.
 
 # Fetch parameters
