@@ -6,7 +6,7 @@ from PIL import Image, ImageOps, ImageDraw
 import os
 
 # Streamlit page configuration
-st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
+st.set_page_config(page_title="AWS MigrationPro", page_icon=":robot_face:", layout="wide")
 
 # Function to crop image into a circle
 def crop_to_circle(image):
@@ -18,10 +18,10 @@ def crop_to_circle(image):
     return result
 
 # Title
-st.title("Co. Portfolio Creator")
+st.title("AWS MigrationPro")
 
 # Display a text box for input
-prompt = st.text_input("Please enter your query?", max_chars=2000)
+prompt = st.text_input("Please enter your question about migration?", max_chars=2000)
 prompt = prompt.strip()
 
 # Display a primary button for submission
@@ -112,7 +112,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         st.image(circular_human_image, width=125)
     with col2_q:
         # Generate a unique key for each question text area
-        st.text_area("Q:", value=chat["question"], height=68, key=f"question_{index}", disabled=True)
+        st.text_area("Question:", value=chat["question"], height=68, key=f"question_{index}", disabled=True)
 
     # Creating columns for Answer
     col1_a, col2_a = st.columns([2, 10])
@@ -127,42 +127,4 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             st.image(circular_robot_image, width=150)
         with col2_a:
             # Generate a unique key for each answer text area
-            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
-
-# Example Prompts Section
-st.write("## Test Knowledge Base Prompts")
-
-# Creating a list of prompts for the Knowledge Base section
-knowledge_base_prompts = [
-    {"Prompt": "Give me a summary of financial market developments and open market operations in January 2023"},
-    {"Prompt": "Tell me the participants view on economic conditions and economic outlook"},
-    {"Prompt": "Provide any important information I should know about consumer inflation, or rising prices"},
-    {"Prompt": "Tell me about the Staff Review of the Economic & financial Situation"}
-]
-
-# Displaying the Knowledge Base prompts as a table
-st.table(knowledge_base_prompts)
-
-# Test Action Group Prompts
-st.write("## Test Action Group Prompts")
-
-# Creating a list of prompts for the Action Group section
-action_group_prompts = [
-    {"Prompt": "Create a portfolio with 3 companies in the real estate industry"},
-    {"Prompt": "Create a portfolio of 4 companies that are in the technology industry"},
-    {"Prompt": "Return me information on the company on TechStashNova Inc."}
-]
-
-# Displaying the Action Group prompts as a table
-st.table(action_group_prompts)
-
-st.write("## Test KB, AG, History Prompt")
-
-# Creating a list of prompts for the specific task
-task_prompts = [
-    {"Task": "Send an email to test@example.com that includes the summary and portfolio report.", 
-     "Note": "The logic for this method is not implemented to send emails"}
-]
-
-# Displaying the task prompt as a table
-st.table(task_prompts)
+            st.text_area("Answer:", value=chat["answer"], height=100, key=f"answer_{index}")
