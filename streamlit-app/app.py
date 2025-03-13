@@ -102,8 +102,14 @@ MAX_HISTORY_WINDOW = 6
 displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 
 # Create a scrollable text area with the entire chat history
-full_history_text = "\n\n".join(
-    [f"**You:** {chat['question']}\n**Discovery Agent**: {chat['answer']}" for chat in st.session_state['history']]
+full_history_text = "<br><br>".join(
+    [
+        f"<span style='color: black;'><b>You:</b> {chat['question']}<br><b>Discovery Agent:</b> {chat['answer']}</span>"
+        for chat in st.session_state['history']
+    ]
 )
+
+# Display chat history with custom styling
+st.markdown(full_history_text, unsafe_allow_html=True)
 
 st.text_area("**Conversation History wiht Discovery Agent**", value=full_history_text, height=400, disabled=True)
