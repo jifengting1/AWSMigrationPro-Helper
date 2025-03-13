@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import os
+from invoke_agent import BedrockAgentClient
 
 # Streamlit page configuration
 st.set_page_config(page_title="AWS MigrationPro", page_icon=":robot_face:", layout="wide")
@@ -24,14 +25,31 @@ st.title("AWS MigrationPro")
 prompt = st.text_input("Please enter your question about migration?", max_chars=2000)
 prompt = prompt.strip()
 
+agent_client = BedrockAgentClient()
+
 # Display a primary button for submission
 submit_button = st.button("Submit", type="primary")
 
 # Display a button to end the session
 end_session_button = st.button("End Session")
 
-# Sidebar for user input
-st.sidebar.title("Trace Data")
+# Sidebar for selecting agent
+agentList = ["Discovery Agent", "Analysis Agent", "Recommendation Agent"]
+selected_agent = st.sidebar.selectbox("Select Tool", agentList)
+
+# Your agent and alias IDs from the Bedrock console
+if selected_agent=='Discovery Agent':
+    agent_id = "OMEPOPUX72"
+    agent_alias_id = "0XNX7B0H4I"
+if selected_agent=='Analysis Agent':
+    agent_id = "PUY8SXIC0X"
+    agent_alias_id = "JW2V480V0Y"
+if selected_agent == "Recommendation Agent":
+    agent_id = "XXXXXXXXXX"
+    agent_alias_id = "XXXXXXXXXX"
+
+# Text input box
+st.write(selected_agent)
 
 # Session State Management
 if 'history' not in st.session_state:
@@ -57,7 +75,12 @@ if submit_button and prompt:
         "sessionId": "MYSESSION",
         "question": prompt
     }
-    response = agenthelper.lambda_handler(event, None)
+    # response = agenthelper.lambda_handler(event, None)
+    response = agent_client.chat_with_agent(
+        agent_id=agent_id,
+        agent_alias_id=agent_alias_id,
+        prompt=prompt
+    )
     
     try:
         # Parse the JSON string
@@ -72,8 +95,8 @@ if submit_button and prompt:
     
     try:
         # Extract the response and trace data
-        all_data = format_response(response_data['response'])
-        the_response = response_data['trace_data']
+        all_data = format_response(response_data['response']) # raw tracing data for debugging purpose, not showing in the current version
+        the_response = response_data['trace_data'] # the actural agent response
     except:
         all_data = "..." 
         the_response = "Apologies, but an error occurred. Please rerun the application" 
@@ -96,7 +119,6 @@ if end_session_button:
     st.session_state['history'].clear()
 
 MAX_HISTORY_WINDOW = 6
-
 
 # Display recent messages in a structured layout
 displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
