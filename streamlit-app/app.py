@@ -126,7 +126,7 @@ displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 # Create a scrollable text area with the entire chat history
 full_history_text = "<br><br>".join(
     [
-        f"<b>You:</b>&nbsp;{chat['question'].strip()}<br><b>{chat['agent'].strip()}:</b>&nbsp;{chat['answer'].strip()}"
+        f"<b>You:</b>&nbsp;{chat['question'].strip()}<br><b>{chat['agent'].strip()}:</b>&nbsp;{chat['answer'].strip()}<br><br>"
         for chat in st.session_state['history']
     ]
 )
