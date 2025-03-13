@@ -82,6 +82,7 @@ if submit_button and prompt:
     st.sidebar.text_area("", value=all_data, height=300)
     st.session_state['history'].append({"question": prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
+    st.session_state['prompt'] = "" # clear out input box
   
 
 if end_session_button:
@@ -96,15 +97,13 @@ if end_session_button:
 
 MAX_HISTORY_WINDOW = 6
 
-# Display conversation history
-st.write("## Conversation History")
 
 # Display recent messages in a structured layout
 displayed_history = st.session_state['history'][-MAX_HISTORY_WINDOW:]
 
 # Create a scrollable text area with the entire chat history
 full_history_text = "\n\n".join(
-    [f"**Question:** {chat['question']}\n**Answer**: {chat['answer']}" for chat in st.session_state['history']]
+    [f"**You:** {chat['question']}\n**Discovery Agent**: {chat['answer']}" for chat in st.session_state['history']]
 )
 
-st.text_area("Conversation History wiht Discovery Agent", value=full_history_text, height=400, disabled=True)
+st.text_area("**Conversation History wiht Discovery Agent**", value=full_history_text, height=400, disabled=True)
