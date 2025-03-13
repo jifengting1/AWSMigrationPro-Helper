@@ -13,7 +13,7 @@ import sys
 import uuid
 
 class BedrockAgentClient:
-    def __init__(self, region_name="us-west-2"):
+    def __init__(self, region_name="us-east-1"):
         # Initialize the Bedrock Agent Runtime client
         self.runtime_client = boto3.client(
             service_name="bedrock-agent-runtime",
