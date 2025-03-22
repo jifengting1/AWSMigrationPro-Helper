@@ -57,6 +57,7 @@ def query_bedrock_prompt_flow(messages_key: str):
         response_stream = response['responseStream']
 
         for event in response_stream:
+            print("Event received:", event)
             if 'flowOutputEvent' in event:
                 yield event['flowOutputEvent']['content']['document']
 
