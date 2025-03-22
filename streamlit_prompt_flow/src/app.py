@@ -12,8 +12,8 @@ session = boto3.Session()
 bedrock_agent_client = session.client(service_name='bedrock-agent-runtime')
 
 # Define the flow identifier and alias identifier
-flow_identifier = 'arn:aws:bedrock:us-east-1:150123420273:flow/DJVL78MHJZ'
-alias_identifier = 'arn:aws:bedrock:us-east-1:150123420273:flow/DJVL78MHJZ/alias/80VZO4XGKU'
+flow_identifier = 'arn:aws:bedrock:us-east-1:774305585272:flow/PUXQWUEVJ3'
+alias_identifier = 'arn:aws:bedrock:us-east-1:774305585272:flow/PUXQWUEVJ3/alias/AM5DB8AZDA'
 
 def render_messages(messages: list, assistant_avatar: str | None = None):
     for message in messages:
