@@ -133,7 +133,7 @@ async def main():
                 "Prompt",
                 placeholder=placeholder_text, 
                 label_visibility="collapsed",
-                height=50,
+                height=100,
             )
             prompt_submitted = st.form_submit_button("Send", type="primary")
         if st.button("Clear all message histories"):
