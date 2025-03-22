@@ -1,4 +1,3 @@
-import invoke_agent as agenthelper
 import streamlit as st
 import json
 import pandas as pd
@@ -25,7 +24,6 @@ st.title("AWS MigrationPro")
 prompt = st.text_input("Please enter your question about migration?", max_chars=2000)
 prompt = prompt.strip()
 
-agent_client = BedrockAgentClient()
 session = boto3.Session()
 bedrock_agent_client = session.client(service_name='bedrock-agent-runtime')
 
