@@ -184,7 +184,7 @@ def migration_pro_page():
     with isv_col:
         st.subheader("Upload ISV Files")
         s3_bucket_name_isv = 'migration.test19'
-        uploaded_file_isv = st.file_uploader("Choose ISV Config file", type=["txt","pdf"], key="isv_config_uploader")
+        uploaded_file_isv = st.file_uploader("Choose ISV Config file", type=["json"], key="isv_config_uploader")
         if uploaded_file_isv is not None:
             if st.button('Upload ISV Config'):
                 with st.spinner("Uploading ISV Config to S3..."):
@@ -198,8 +198,8 @@ def migration_pro_page():
         
     with customer_col:
         st.subheader("Upload Customer Files")
-        s3_bucket_name_customer = 'migration.test19'
-        uploaded_file_customer = st.file_uploader("Choose Customer Config file", type=["txt","pdf"], key="customer_config_uploader")
+        s3_bucket_name_customer = 'customer-config-file-v1'
+        uploaded_file_customer = st.file_uploader("Choose Customer Config file", type=["json"], key="customer_config_uploader")
         if uploaded_file_customer is not None:
             if st.button('Upload Customer Config'):
                 with st.spinner("Uploading Customer Config to S3..."):
