@@ -122,7 +122,46 @@ def is_config_complete(content: str) -> str:
     reply = response["output"]["message"]["content"][0]["text"].strip().lower()
     return "Yes" if reply.startswith("yes") else "No"
 
-def chat_with_agent(agent_id, alias_id, region='us-east-1'):
+# sync knolwedge base
+def sync_knowledge_base(knowledge_base_id, data_source_id):
+    # Create Bedrock Agent client
+    bedrock_agent = boto3.client('bedrock-agent')
+    
+    try:
+        # Start the ingestion job
+        response = bedrock_agent.start_ingestion_job(
+            knowledgeBaseId=knowledge_base_id,
+            dataSourceId=data_source_id
+        )
+        
+        ingestion_job_id = response['ingestionJob']['ingestionJobId']
+        
+        # Poll for job completion
+        while True:
+            status_response = bedrock_agent.get_ingestion_job(
+                knowledgeBaseId=knowledge_base_id,
+                dataSourceId=data_source_id,
+                ingestionJobId=ingestion_job_id
+            )
+            
+            status = status_response['ingestionJob']['status']
+            
+            if status == 'COMPLETE':
+                print("Data sync completed successfully")
+                break
+            elif status in ['FAILED', 'STOPPED']:
+                print(f"Data sync failed with status: {status}")
+                if 'errorMessage' in status_response['ingestionJob']:
+                    print(f"Error: {status_response['ingestionJob']['errorMessage']}")
+                break
+                
+            print(f"Sync info between agents in progress... Current status: {status}")
+            time.sleep(5)  # Wait for 30 seconds before checking again
+            
+    except Exception as e:
+        print(f"Error during sync: {str(e)}")
+
+def chat_with_agent(agent_id, alias_id, region='us-east-1', prompt_override = None):
     client = boto3.client("bedrock-agent-runtime", region_name=region)
     session_id = str(uuid.uuid4())
 
@@ -137,13 +176,14 @@ def chat_with_agent(agent_id, alias_id, region='us-east-1'):
     if not st.session_state.chat_history:
         st.chat_message("assistant").markdown("💬 Hi, I am MigrationPro Agent and I can help you build a migration plan based on your config files. Type [ I need help with migration ] to begin:")
 
-    if prompt := st.chat_input("You:"):
-        st.session_state.chat_history.append({"role": "user", "content": prompt})
-        st.chat_message("user").markdown(prompt)
+    while True: 
+        if prompt := st.chat_input("You:"):
+            st.session_state.chat_history.append({"role": "user", "content": prompt})
+            st.chat_message("user").markdown(prompt)
 
-        if prompt.lower() in ["exit", "quit"]:
-            st.chat_message("assistant").markdown("👋 Ending session.")
-            return "end"
+            if prompt.lower() in ["exit", "quit"]:
+                st.chat_message("assistant").markdown("👋 Ending session.")
+                return "end"
 
         try:
             response = client.invoke_agent(
@@ -160,20 +200,26 @@ def chat_with_agent(agent_id, alias_id, region='us-east-1'):
                         content = chunk['chunk'].get('bytes', '').decode("utf-8")
                         agent_response += content
 
-            st.session_state.chat_history.append({"role": "assistant", "content": agent_response})
-            st.chat_message("assistant").markdown(agent_response)
+                        st.session_state.chat_history.append({"role": "assistant", "content": agent_response})
+                        st.chat_message("assistant").markdown(agent_response)
 
-            if is_file_upload_complete(agent_response) == "Yes":
-                return "to_info_validation"
-            if is_config_complete(agent_response) == "Yes":
-                return "to_analysis"
+                        # determine signal to switch agent
+                        if agent_id == "3SZXST6KPE" and is_file_upload_complete(content) == "Yes":
+                            st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected file upload is complete. I will move on to config file validation."})
+                            return "to_info_validation"
+                        if agent_id == "ATTGGAKZKM" and is_config_complete(content) == "Yes":
+                            st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected config file review is complete. I will move on to analysis the content for making a migration plan."})
+                            return "to_analysis"
+            # Only override the first message
+            if prompt_override:
+                prompt_override = None
 
         except Exception as e:
             st.error(f"❌ Error: {e}")
             st.error(f"❌ Error Type: {type(e)}")
-            return "end"
+            break
 
-    return None
+    return "end"
 
 def migration_pro_page():
     st.title("MigrationPro")
@@ -188,13 +234,13 @@ def migration_pro_page():
         if uploaded_file_isv is not None:
             if st.button('Upload ISV Config'):
                 with st.spinner("Uploading ISV Config to S3..."):
-                    file_name = uploaded_file_isv.name
+                    file_name = "master_config"
                     if upload_to_s3(uploaded_file_isv, s3_bucket_name_isv, file_name):
                         st.success(f"ISV file {file_name} uploaded successfully!")
                     else:
                         st.error("Failed to upload ISV file to S3.")
             else:
-                st.info(f"ISV file {uploaded_file_isv.name} selected. Click to upload.")
+                st.info(f"ISV file {file_name} selected. Click to upload.")
         
     with customer_col:
         st.subheader("Upload Customer Files")
@@ -203,13 +249,13 @@ def migration_pro_page():
         if uploaded_file_customer is not None:
             if st.button('Upload Customer Config'):
                 with st.spinner("Uploading Customer Config to S3..."):
-                    file_name = uploaded_file_customer.name
+                    file_name = "customer_config"
                     if upload_to_s3(uploaded_file_customer, s3_bucket_name_customer, file_name):
                         st.success(f"Customer file {file_name} uploaded successfully!")
                     else:
                         st.error("Failed to upload Customer file to S3.")
             else:
-                st.info(f"Customer file {uploaded_file_customer.name} selected. Click to upload.")
+                st.info(f"Customer file {file_name} selected. Click to upload.")
 
     # Chat interface
     st.header("Chat with MigrationPro Agent")
@@ -219,14 +265,17 @@ def migration_pro_page():
 
     if st.session_state.current_agent == "discovery":
         next_step = chat_with_agent(DISCOVERY_AGENT_ID, DISCOVERY_AGENT_ALIAS_ID)
+
         if next_step == "to_info_validation":
             st.session_state.current_agent = "info_validation"
-    elif st.session_state.current_agent == "info_validation":
-        next_step = chat_with_agent(INFO_VALIDATION_AGENT_ID, INFO_VALIDATION_AGENT_ALIAS, 'us-east-1')
+            sync_knowledge_base('SOUOF3OQUP', 'GWBIH3DD0R') # master config
+            next_step = chat_with_agent(INFO_VALIDATION_AGENT_ID, INFO_VALIDATION_AGENT_ALIAS, 'us-east-1', prompt_override="I have uploaded the files.")
+
         if next_step == "to_analysis":
             st.session_state.current_agent = "analysis"
-    elif st.session_state.current_agent == "analysis":
-        chat_with_agent(ANALYSIS_AGENT_ID, ANALYSIS_AGENT_ALIAS, 'us-east-1')
+            # sync config files with knowledge base
+            sync_knowledge_base('QZHNS8O1VZ', 'H2URI0CHKM') # customer config kb
+            next_step = chat_with_agent(ANALYSIS_AGENT_ID, ANALYSIS_AGENT_ALIAS, 'us-east-1', prompt_override="Help me make a migration plan")
 
 def ecm_analysis_page():
     st.title("ECM Analysis")
@@ -238,7 +287,7 @@ def ecm_analysis_page():
             file_name = uploaded_file_excel.name
             if upload_to_s3(uploaded_file_excel, s3_bucket_name_excel, file_name):
                 st.success(f"Excel file {file_name} uploaded successfully!")
-                #display_graph(file_name)
+                display_graph(file_name)
             else:
                 st.error("Failed to upload Excel file to S3.")
         else:
