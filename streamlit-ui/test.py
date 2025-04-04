@@ -59,6 +59,7 @@ def upload_to_s3(file, bucket_name, object_name):
         st.error(f"An error occurred: {e}")
         return False
 
+# check if file upload is completed or not. 
 def is_file_upload_complete(content: str) -> str:
     bedrock_runtime = boto3.client("bedrock-runtime", region_name="us-east-1")
 
@@ -89,6 +90,7 @@ def is_file_upload_complete(content: str) -> str:
     reply = response["output"]["message"]["content"][0]["text"].strip().lower()
     return "Yes" if reply.startswith("yes") else "No"
 
+# check if config files have missing info
 def is_config_complete(content: str) -> str:
     bedrock_runtime = boto3.client("bedrock-runtime", region_name="us-east-1")
 
@@ -183,7 +185,7 @@ def chat_with_agent(agent_id, alias_id, region='us-east-1', prompt_override = No
 
             if prompt.lower() in ["exit", "quit"]:
                 st.chat_message("assistant").markdown("👋 Ending session.")
-                return "end"
+                break
 
         try:
             response = client.invoke_agent(
