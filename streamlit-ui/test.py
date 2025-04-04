@@ -187,39 +187,39 @@ def chat_with_agent(agent_id, alias_id, region='us-east-1', prompt_override = No
                 st.chat_message("assistant").markdown("👋 Ending session.")
                 break
 
-        try:
-            response = client.invoke_agent(
-                agentId=agent_id,
-                agentAliasId=alias_id,
-                sessionId=session_id,
-                inputText=prompt
-            )
+            try:
+                response = client.invoke_agent(
+                    agentId=agent_id,
+                    agentAliasId=alias_id,
+                    sessionId=session_id,
+                    inputText=prompt
+                )
 
-            agent_response = ""
-            for chunk in response.get('completion', []):             
-                if isinstance(chunk, dict):
-                    if 'chunk' in chunk:
-                        content = chunk['chunk'].get('bytes', '').decode("utf-8")
-                        agent_response += content
+                agent_response = ""
+                for chunk in response.get('completion', []):             
+                    if isinstance(chunk, dict):
+                        if 'chunk' in chunk:
+                            content = chunk['chunk'].get('bytes', '').decode("utf-8")
+                            agent_response += content
 
-                        st.session_state.chat_history.append({"role": "assistant", "content": agent_response})
-                        st.chat_message("assistant").markdown(agent_response)
+                            st.session_state.chat_history.append({"role": "assistant", "content": agent_response})
+                            st.chat_message("assistant").markdown(agent_response)
 
-                        # determine signal to switch agent
-                        if agent_id == "3SZXST6KPE" and is_file_upload_complete(content) == "Yes":
-                            st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected file upload is complete. I will move on to config file validation."})
-                            return "to_info_validation"
-                        if agent_id == "ATTGGAKZKM" and is_config_complete(content) == "Yes":
-                            st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected config file review is complete. I will move on to analysis the content for making a migration plan."})
-                            return "to_analysis"
-            # Only override the first message
-            if prompt_override:
-                prompt_override = None
+                            # determine signal to switch agent
+                            if agent_id == "3SZXST6KPE" and is_file_upload_complete(content) == "Yes":
+                                st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected file upload is complete. I will move on to config file validation."})
+                                return "to_info_validation"
+                            if agent_id == "ATTGGAKZKM" and is_config_complete(content) == "Yes":
+                                st.session_state.chat_history.append({"role": "✅LOG", "content": "Detected config file review is complete. I will move on to analysis the content for making a migration plan."})
+                                return "to_analysis"
+                # Only override the first message
+                if prompt_override:
+                    prompt_override = None
 
-        except Exception as e:
-            st.error(f"❌ Error: {e}")
-            st.error(f"❌ Error Type: {type(e)}")
-            break
+            except Exception as e:
+                st.error(f"❌ Error: {e}")
+                st.error(f"❌ Error Type: {type(e)}")
+                break
 
     return "end"
 
